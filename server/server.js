@@ -3,9 +3,8 @@ process.env.NODE_CONFIG_DIR = __dirname+'/config';
  const config = require('config');
 const express = require('express');
 const _ = require('lodash');
+
 const {user} = require('./model/user');
-
-
 
  console.log(config.get('level'));
 
@@ -29,6 +28,17 @@ app.post('/api/users',(req,res)=>{
     },(err)=>{req.body
         res.status(400).json({error:`somthings went wrong . ${err}`});
     });   
+});
+
+app.post('/api/login',(req,res)=>{
+    const body = _.pick(req.body,['email','password']);
+    user.findByCredentials(body.email,body.password).then((user)=>{
+        user.generateAuthToken().then((token)=>{
+                res.header('x-auth',token).status(200).send(token)
+        },(err)=>{
+            res.status(400).json({error:`something went wrong${err}`})
+        });
+    });
 });
 
 app.listen(config.get('PORT'),()=>{
