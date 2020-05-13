@@ -3,8 +3,14 @@ process.env.NODE_CONFIG_DIR = __dirname + "/config";
 const config = require("config");
 const express = require("express");
 const _ = require("lodash");
+const morgan = require("morgan");
+const helmet = require("helmet");
+const winston = require("winston");
+const fs = require('fs');
+const path = require('path');
 
 const { user } = require("./model/user");
+const {authenticate} = require('./middleware/authenticate')
 
 console.log(config.get("level"));
 
@@ -15,9 +21,21 @@ console.log(config.get("level"));
 //  })
 
 const app = express();
-app.use(express.json());
+const requestLogger = fs.createWriteStream(path.join(__dirname, 'log/requests.log'));
+const logger = winston.createLogger({
+    transports:[
+    new winston.transports.Console(),
+    new winston.transports.File({filename:path.join(__dirname,'log/server-status.log')})
+    ]
 
-app.post("/api/users", async (req, res) => {
+
+});
+app.use(express.json());
+app.use(helmet());
+app.use(morgan('combined',{stream:requestLogger}));
+
+
+app.post("/api/users", authenticate, async (req, res) => {
   try {
     const body = _.pick(req.body, ["fullname", "email", "password"]);
     console.log(req.body);
@@ -48,5 +66,6 @@ app.post("/api/login", async(req, res) => {
 });
 
 app.listen(config.get("PORT"), () => {
-  console.log(`server is running on port ${config.get("PORT")}`);
+//   console.log(`server is running on port ${config.get("PORT")}`);
+    logger.info(`Server running on port ${config.get('PORT')}`);
 });
