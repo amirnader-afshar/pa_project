@@ -23,6 +23,7 @@
     "mongodb": "^3.5.7",
     "mongoose": "^5.9.13",
     "morgan": "^1.10.0",
+    "persian-date": "^1.1.0",
     "validator": "^13.0.0",
     "winston": "^3.2.1"
   }

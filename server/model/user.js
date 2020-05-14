@@ -33,8 +33,24 @@ let userschema = new mongoose.Schema({
         required:true
     }
     ,tokens:[{
+        _id:false,
         access:tokenOptions,
         token:tokenOptions
+    }]
+    ,payment:[{
+        info:{
+            type:String,
+            trim:true,
+            required:true
+        },
+        amount:{
+            type:Number,
+            required:true
+        },
+        date:{
+            type:String,
+            required:true
+        }
     }]
 });
 userschema.methods.toJSON = function(){
