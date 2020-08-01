@@ -2,64 +2,97 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
-const {mongoose}= require('./../db/mongoose');
 const config = require('config');
+
+const {mongoose} = require('./../db/mongoose');
+
 const tokenOptions = {
-    type:String,
-    required:true            
-}
-let userschema = new mongoose.Schema({
-    fullname:{
-        type:String,
-        required:true,
-        minlenght:3,
-        trim:true
+    type: String,
+    required: true
+};
+
+let UserSchema = new mongoose.Schema({
+    fullname: {
+        type: String,
+        required: true,
+        minlength: 3,
+        trim: true
     },
-    email:{
-        type:String,
-        required:true,
-        minlenght:6,
-        trim:true,
-        unique:true,
-        validate:{
-            validator:validator.isEmail,
-            message : '{value} is not valid email'
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        minlength: 6,
+        trim: true,
+        validate: {
+            validator: validator.isEmail,
+            message: '{Value} is not valid email'
         }
-    }
-    ,
-    password:{
-        type:String,
-        minlength:6,
-        required:true
-    }
-    ,tokens:[{
-        _id:false,
-        access:tokenOptions,
-        token:tokenOptions
-    }]
-    ,payment:[{
-        info:{
-            type:String,
-            trim:true,
-            required:true
+    },
+    password: {
+        type: String,
+        minlength: 6,
+        required: true
+    },
+    tokens:[{
+        _id: false,
+        access: tokenOptions,
+        token: tokenOptions
+    }],product: [{
+        name: {
+            type: String,
+            required: true,
+            trim: true
         },
-        amount:{
-            type:Number,
-            required:true
+        price: {
+            type: Number,
+            required: true
         },
-        date:{
-            type:String,
-            required:true
+        img_url: {
+            type: String,
+            required: true
+        }
+    }],
+    payment: [{
+        info: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        amount: {
+            type: Number,
+            required: true
+        },
+        date: {
+            type: String,
+            required: true
+        }
+    }],
+    receive:[{
+        info: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        amount: {
+            type: Number,
+            required: true
+        },
+        date: {
+            type: String,
+            required: true
         }
     }]
 });
-userschema.methods.toJSON = function(){
-    let user= this;
+
+UserSchema.methods.toJSON = function () {
+    let user = this;
     let userObject = user.toObject();
-    return _.pick(userObject,['_id','fullname','email'])
+
+    return _.pick(userObject, ['_id', 'fullname', 'email']);
 }
 
-userschema.statics.findByCredentials = function (email, password) {
+UserSchema.statics.findByCredentials = function (email, password) {
     let User = this;
 
     return User.findOne({
@@ -81,25 +114,36 @@ userschema.statics.findByCredentials = function (email, password) {
     });
 }
 
-userschema.statics.findByToken = function(token){
-    let user = this;
+UserSchema.statics.findByToken = function (token) {
+    let User = this;
     let decoded;
 
     try {
-        decoded = jwt.verify(token,config.get('JWT_SECRET'));
-    }
-    catch (e){
+        decoded = jwt.verify(token, config.get('JWT_SECRET'));
+    } catch (e) {
         return Promise.reject();
     }
 
-    return user.findOne({
-        _id:decoded.id,
-        'tokens.token':token,
-        'tokens.access':'auth'
+    return User.findOne({
+        _id: decoded._id,
+        'tokens.token': token,
+        'tokens.access': 'auth'
     });
 }
 
-userschema.methods.generateAuthToken = function () {
+UserSchema.methods.removeToken = function (token) {
+    let user = this;
+
+    return user.update({
+        $pull: {
+            tokens: {
+                token
+            }
+        }
+    });
+}
+
+UserSchema.methods.generateAuthToken = function () {
     let user = this;
     let access = 'auth';
 
@@ -118,25 +162,23 @@ userschema.methods.generateAuthToken = function () {
     });
 }
 
+UserSchema.pre('save', function (next) {
+    let user = this;
 
-userschema.pre('save',function(next){
-    let user = this ;
-    if (user.isModified('password')){
-        bcrypt.genSalt(10,(err,salt)=>{
-            bcrypt.hash(user.password,salt,(err,hash)=>{
-                user.password= hash;
+    if (user.isModified('password')) {
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(user.password, salt, (err, hash) => {
+                user.password = hash;
                 next();
             });
         });
-    }
-    else{
+    } else {
         next();
     }
-    
 });
 
-let user = mongoose.model ('user',userschema);
+let User = mongoose.model('User', UserSchema);
 
-module.exports={
-    user
-}
+module.exports = {
+    User
+};

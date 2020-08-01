@@ -1,7 +1,6 @@
 {
-    "level" : "development",
-    "PORT":3000,
-    "MONGOURL":"mongodb://localhost:27017/PA_DB",
-    "JWT_SECRET":"NADER"
-    
+    "Level": "development",
+    "PORT": 3000,
+    "MONGOURI": "mongodb://localhost:27017/PA_DB",
+    "JWT_SECRET": "toplearn"
 }
