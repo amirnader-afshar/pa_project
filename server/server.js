@@ -24,9 +24,10 @@ const {
 const {
     logger
 } = require('./utils/winstonOptions');
-addconst {
+ const {
     call_sp
 } = require('./db/call_general_sp');
+const { delay } = require('lodash');
 
 printRunLevel(config.get('Level'));
 
@@ -167,6 +168,7 @@ app.post('/api/payment', authenticate, async (req, res) => {
 
 app.get('/api/product', authenticate, async (req, res) => {
     try {
+        await new Promise(resolve => setTimeout(resolve, 5000));
         let user = await User.findOne({
             _id: req.user._id
         });
