@@ -32,7 +32,7 @@ const {
  const {
     call_sp
 } = require('./db/call_general_sp');
-const { delay } = require('lodash');
+const { delay, filter } = require('lodash');
 
 printRunLevel(config.get('Level'));
 
@@ -208,10 +208,22 @@ app.post('/api/payment', authenticate, async (req, res) => {
 
 app.get('/api/product', authenticate, async (req, res) => {
     try {
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        let user = await User.findOne({
-            _id: req.user._id
-        });
+        //await new Promise(resolve => setTimeout(resolve, 1000));
+        const body = _.pick(req.body, ['id']);
+        console.log(body.id)
+        let user;
+        if (body.id!=undefined){
+        let user = await User.findOne(
+            {_id: req.user._id},
+            {_id:0,product:{$elemMatch:{_id:body.id}}
+        }
+        );
+    }
+    else
+    {
+        let user = await User.findOne(
+            {_id: req.user._id}) 
+    }
 
         if (!user) {
             return res.status(404).json({
@@ -219,7 +231,10 @@ app.get('/api/product', authenticate, async (req, res) => {
             });
         }
 
-        res.status(200).send(user.product)
+        
+
+
+        res.status(200).send(user.product);
 
     } catch (e) {
         res.status(400).json({
