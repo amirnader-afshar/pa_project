@@ -4,3 +4,5 @@ log/
 server/log/requests.log
 server/log/requests.log
 server/log/server-status.log
+server/log/requests.log
+server/log/server-status.log
