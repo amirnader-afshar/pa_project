@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 const persianDate = require('persian-date');
+const cors = require('cors');
 
 const {
     User
@@ -42,6 +43,7 @@ const requestLogger = fs.createWriteStream(path.join(__dirname, 'log/requests.lo
 persianDate.toLocale('en');
 const date = new persianDate().format('YYYY/M/DD')
 
+app.use(cors());
 app.use(express.json());
 app.use(helmet());
 app.use(morgan('combined', {
@@ -206,22 +208,21 @@ app.post('/api/payment', authenticate, async (req, res) => {
     }
 });
 
-app.get('/api/product', authenticate, async (req, res) => {
+app.get('/api/product/:id?', authenticate, async (req, res) => {
     try {
         //await new Promise(resolve => setTimeout(resolve, 1000));
-        const body = _.pick(req.body, ['id']);
-        console.log(body.id)
+        let id = req.params.id;
         let user;
-        if (body.id!=undefined){
-        let user = await User.findOne(
+        if (id!=undefined){
+        user = await User.findOne(
             {_id: req.user._id},
-            {_id:0,product:{$elemMatch:{_id:body.id}}
+            {_id:0,product:{$elemMatch:{_id:id}}
         }
         );
     }
     else
     {
-        let user = await User.findOne(
+        user = await User.findOne(
             {_id: req.user._id}) 
     }
 
