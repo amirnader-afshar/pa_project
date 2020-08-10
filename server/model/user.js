@@ -51,7 +51,12 @@ let UserSchema = new mongoose.Schema({
         img_url: {
             type: String,
             required: true
+        },
+        content:{
+            type:String,
+            required:true
         }
+        
     }],
     payment: [{
         info: {
