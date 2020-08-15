@@ -55,7 +55,31 @@ let UserSchema = new mongoose.Schema({
         content:{
             type:String,
             required:true
-        }
+        },
+        
+        comment:[{
+            name:{
+                type: String,
+                required: true,
+                trim: true
+            },
+            email:{
+                type: String,
+                required: true,                                
+                trim: true,
+                validate: {
+                    validator: validator.isEmail,
+                    message: '{Value} is not valid email'
+                }
+                ,
+                comment :{
+                    type: String,
+                    required: true,                                
+                    trim: true, 
+                    minlength: 11,  
+                } 
+            }
+        }]
         
     }],
     payment: [{

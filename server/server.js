@@ -11,6 +11,7 @@ const path = require('path');
 const _ = require('lodash');
 const persianDate = require('persian-date');
 const cors = require('cors');
+const mongoose = require('mongoose');
 
 const {
     User
@@ -136,6 +137,42 @@ app.delete('/api/logout', authenticate, async (req, res) => {
         res.status(200).json({
             Message: 'Logout successfull.'
         });
+    } catch (e) {
+        res.status(400).json({
+            Error: `Something went wrong. ${e}`
+        });
+    }
+});
+
+app.post('/api/comment', authenticate, async (req, res) => {
+    try {
+        const body = _.pick(req.body, ['name', 'email','comment','id']);
+        console.log(mongoose.Types.ObjectId.isValid(body.id));
+        
+        
+        let user = await User.findOneAndUpdate(
+            {_id: req.user._id},
+            {_id:0,product:{$elemMatch:{_id:0}}
+        }, {
+            $push: {
+                comment: {
+                    name: body.name,
+                    email: body.email,
+                    comment:body.comment
+                }
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                Error: 'User not found'
+            });
+        }
+
+        res.status(200).json({
+            Message: 'comment has been saved.'
+        });
+
     } catch (e) {
         res.status(400).json({
             Error: `Something went wrong. ${e}`
