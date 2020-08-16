@@ -146,16 +146,16 @@ app.delete('/api/logout', authenticate, async (req, res) => {
 
 app.post('/api/comment', authenticate, async (req, res) => {
     try {
-        const body = _.pick(req.body, ['name', 'email','commenttext','id']);
+        const body = _.pick(req.body, ['name', 'email','content','id']);
         console.log(body);
         let user = await User.findOneAndUpdate(
             {_id: req.user._id,"product._id":body.id}
-            ,{
+            ,{$push:{
                 "product.$.comment":{
                     "name":body.name,
                     "email" :body.email,
-                    "commenttext":body.commenttext,
-
+                    "content":body.content
+                }
                 }
             }
 
@@ -170,7 +170,7 @@ app.post('/api/comment', authenticate, async (req, res) => {
 
        
 
-        res.status(200).send(user.product);
+        res.status(200).json( {Message: 'comment has been saved.'});
 
     } catch (e) {
         res.status(400).json({
