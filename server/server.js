@@ -146,22 +146,21 @@ app.delete('/api/logout', authenticate, async (req, res) => {
 
 app.post('/api/comment', authenticate, async (req, res) => {
     try {
-        const body = _.pick(req.body, ['name', 'email','comment','id']);
-        console.log(mongoose.Types.ObjectId.isValid(body.id));
-        
-        
+        const body = _.pick(req.body, ['name', 'email','commenttext','id']);
+        console.log(body);
         let user = await User.findOneAndUpdate(
-            {_id: req.user._id},
-            {_id:0,product:{$elemMatch:{_id:0}}
-        }, {
-            $push: {
-                comment: {
-                    name: body.name,
-                    email: body.email,
-                    comment:body.comment
+            {_id: req.user._id,"product._id":body.id}
+            ,{
+                "product.$.comment":{
+                    "name":body.name,
+                    "email" :body.email,
+                    "commenttext":body.commenttext,
+
                 }
             }
-        });
+
+                          
+        );
 
         if (!user) {
             return res.status(404).json({
@@ -169,9 +168,9 @@ app.post('/api/comment', authenticate, async (req, res) => {
             });
         }
 
-        res.status(200).json({
-            Message: 'comment has been saved.'
-        });
+       
+
+        res.status(200).send(user.product);
 
     } catch (e) {
         res.status(400).json({

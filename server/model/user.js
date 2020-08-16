@@ -72,11 +72,10 @@ let UserSchema = new mongoose.Schema({
                     message: '{Value} is not valid email'
                 }
                 ,
-                comment :{
+                commenttext :{
                     type: String,
                     required: true,                                
-                    trim: true, 
-                    minlength: 11,  
+                    trim: true  
                 } 
             }
         }]
