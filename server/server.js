@@ -146,8 +146,8 @@ app.delete('/api/logout', authenticate, async (req, res) => {
 
 app.post('/api/comment', authenticate, async (req, res) => {
     try {
-        const body = _.pick(req.body, ['name', 'email','content','id']);
-        console.log(body);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const body = _.pick(req.body, ['name', 'email','content','id']);        
         let user = await User.findOneAndUpdate(
             {_id: req.user._id,"product._id":body.id}
             ,{$push:{
@@ -157,14 +157,12 @@ app.post('/api/comment', authenticate, async (req, res) => {
                     "content":body.content
                 }
                 }
-            }
-
-                          
+            }                          
         );
 
         if (!user) {
             return res.status(404).json({
-                Error: 'User not found'
+                Error: 'product not found'
             });
         }
 
@@ -179,6 +177,32 @@ app.post('/api/comment', authenticate, async (req, res) => {
     }
 });
 
+
+app.get('/api/comment/:productid', authenticate, async (req, res) => {
+    try {
+        //await new Promise(resolve => setTimeout(resolve, 1000));
+        let id = req.params.productid;
+        let user;    
+        user = await User.findOne(
+            {_id: req.user._id},
+            {_id:0,product:{$elemMatch:{_id:id}}
+        }
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                Error: 'product not found'
+            });
+        }
+
+        res.status(200).json(user.product[0].comment);
+
+    } catch (e) {
+        res.status(400).json({
+            Error: `Something went wrong. ${e}`
+        });
+    }
+});
 
 app.post('/api/product', authenticate, async (req, res) => {
     try {
@@ -268,9 +292,7 @@ app.get('/api/product/:id?', authenticate, async (req, res) => {
             });
         }
 
-        
-
-
+    
         res.status(200).send(user.product);
 
     } catch (e) {
