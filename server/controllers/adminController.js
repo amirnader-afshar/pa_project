@@ -1,4 +1,6 @@
 const { User } = require("../model/user");
+const { Slide } = require("../model/slide");
+
 const _ = require("lodash");
 
   exports.login = async (req, res) => {

@@ -6,4 +6,7 @@ const { authenticate } = require("../middleware/authenticate");
 const router = express.Router();
 
 router.post("/comments",authenticate,  commentController.comment);
-router.get("/comments/:productid&:page?",authenticate,  commentController.getcomment); 
+router.get("/comments",authenticate,  commentController.getcomment); 
+
+
+module.exports = router;

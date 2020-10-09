@@ -11,21 +11,14 @@ const path = require("path");
 const _ = require("lodash");
 const persianDate = require("persian-date");
 const cors = require("cors");
-const mongoose = require("mongoose");
 
-const { User } = require("./model/user");
-const { Slide } = require("./model/slide");
 
 const adminRoutes = require("./routes/adminRout");
 const commentRoutes = require("./routes/commentRoute");
 const  productRoute= require("./routes/productRoute");
 
 
-const { splitDate, printRunLevel } = require("./utils/utils");
 const { logger } = require("./utils/winstonOptions");
-const { call_sp } = require("./db/call_general_sp");
-const { delay, filter } = require("lodash");
-
 
 printRunLevel(config.get("Level"));
 

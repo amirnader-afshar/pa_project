@@ -34,8 +34,8 @@ exports.comment = async (req, res) => {
 exports.getcomment = async (req, res) => {
       try {
         await new Promise(resolve => setTimeout(resolve, 1000));
-        let id = req.params.productid;
-        let page = req.params.page;
+        let id = req.query.productid;
+        let page = req.query.page;
         page = (page-1)*10;
         let user;
         user = await User.findOne(

@@ -35,11 +35,10 @@ const _ = require("lodash");
     }
   };
 
-
 exports.getproduct = async (req, res) => {
   try {
     //await new Promise(resolve => setTimeout(resolve, 1000));
-    let id = req.params.id;
+    let id = req.query.id;
     let user;
     if (id != undefined) {
       user = await User.findOne(

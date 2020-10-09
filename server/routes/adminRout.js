@@ -10,6 +10,6 @@ router.post("/users",authenticate, adminController.users);
 router.delete("/logout",authenticate, adminController.logout )
 
 router.post("/slides",authenticate, adminController.slides )
-router.get("/slides",authenticate, adminController.getslides )
+router.get("/slides", adminController.getslides )
 
 module.exports = router;
