@@ -47,8 +47,7 @@ exports.getcomment = async (req, res) => {
             },
             'product.comment':{$slice:[page,10]}
           }
-        );
-        
+        );        
         if (!user) {
           return res.status(404).json({
             Error: "product not found",
@@ -62,3 +61,31 @@ exports.getcomment = async (req, res) => {
         });
       }
     };
+
+exports.getcommentcount = async (req, res) => {
+      try {       
+        let id = req.query.productid;
+        let Ccount=0;
+        user = await User.findOne(
+          { _id: req.user._id },
+          {
+            _id: 0,
+            product: {
+              $elemMatch: { _id: id },      
+            } 
+          }
+        );        
+        if (!user) {
+          return res.status(404).json({
+            Error: "product not found",
+          });
+        }  
+ 
+        res.status(200).json({commentCount: user.product[0].comment.length});
+      } catch (e) {
+        res.status(400).json({
+          Error: `Something went wrong. ${e}`,
+        });
+      }
+    };
+

@@ -12,13 +12,12 @@ const _ = require("lodash");
 const persianDate = require("persian-date");
 const cors = require("cors");
 
-
 const adminRoutes = require("./routes/adminRout");
 const commentRoutes = require("./routes/commentRoute");
 const  productRoute= require("./routes/productRoute");
 
-
 const { logger } = require("./utils/winstonOptions");
+const  {printRunLevel}= require("./utils/utils");
 
 printRunLevel(config.get("Level"));
 
